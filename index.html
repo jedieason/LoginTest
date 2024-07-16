@@ -206,7 +206,7 @@
     <div class="container">
         <div class="header">𝔑𝔗𝔘𝔐𝔈𝔇 ℭ𝔄𝔐𝔓</div>
         <div class="header-button-row">
-            <button id="userButton" class="user-button">jedieason<span id="userName"></span></button>
+            <button id="userButton" class="user-button"><span id="userName"></span></button>
             <button id="signInButton" class="login-button">登入</button>
             <button id="signOutButton" class="login-button">登出</button>
         </div>
@@ -268,7 +268,7 @@
   const userName = document.getElementById("userName");
 
   signOutButton.style.display = "none";
-//   userButton.style.display = "none";
+  userButton.style.display = "none";
 
   const userSignIn = async() => {
     signInWithPopup(auth, provider)
@@ -436,15 +436,13 @@
         }
 
         if (!isMobile()) {
-            // 每秒檢查一次
             setInterval(checkDevTools, 1000);
         } else {
             console.log('在移動設備上，不執行開發者工具檢測');
         }
     }
 
-    // 使用方法
-    // detectDevToolsAndRespond();
+    detectDevToolsAndRespond();
 
     function uselessWebButton() {
         var sitesList = [
