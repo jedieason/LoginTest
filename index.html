@@ -173,6 +173,7 @@
             right: 20px;
             align-items: center;
             z-index: 1000;
+            gap: 10px;
         }
         .login-button {
             color: #fff;
@@ -187,14 +188,14 @@
         }
         .user-button {
             color: #aaa;
-            background: #fff;
+            background: #fff; /* 修改這一行，改為白色背景 */
             border-radius: 6px;
             padding: 3px;
             font-size: 1em;
             cursor: pointer;
-            background: none;
             border: none;
             outline: none;
+            width: auto;
         }
     </style>
 </head>
@@ -288,66 +289,17 @@
 
   let userEmail = '';
 
-    onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, (user) => {
         if (user) {
+            signInButton.style.display = "none"; // 添加這一行
             signOutButton.style.display = "block";
             userButton.style.display = "block";
             userName.innerHTML = user.displayName;
-            userEmail = user.email;  // 將 user.email 儲存到變數中
+            userEmail = user.email;
         } else {
             signOutButton.style.display = "none";
-            message.style.display = "none";
         }
     });
-
-
-  signInButton.addEventListener('click', userSignIn);
-  signOutButton.addEventListener('click', userSignOut);
-  topUpButton.addEventListener('click', topUp);
-
-  async function updateServerBalance(userName, newBalance) {
-        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=updateBalance&username=${encodeURIComponent(userName)}&balance=${newBalance}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        return result.success;
-    }
-
-    async function getBalance(userName) {
-        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=queryBalance&username=${encodeURIComponent(userName)}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        return result.success ? result.balance : 0;
-    }
-  
-</script>
-<script>
-    function showModal(message) {
-        const modal = document.getElementById('modal');
-        const balanceInfo = document.getElementById('balance-info');
-        balanceInfo.textContent = message;
-        modal.style.display = 'flex';
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('modal');
-        modal.style.display = 'none';
-    }
-
-    function showLoading() {
-        const loadingMessage = document.getElementById('loadingMessage');
-        loadingMessage.style.display = 'flex';
-        setTimeout(() => {
-            loadingMessage.style.opacity = '1';
-        }, 10);
-    }
-
-    function hideLoading() {
-        const loadingMessage = document.getElementById('loadingMessage');
-        loadingMessage.style.opacity = '0';
-        setTimeout(() => {
-            loadingMessage.style.display = 'none';
-        }, 500);
-    }
 
     async function topUp() {
         if (!checkUserEmail(userEmail)){
@@ -379,6 +331,57 @@
             hideLoading();
             showModal('儲值失敗，請稍後再試');
         }
+    }
+
+
+  signInButton.addEventListener('click', userSignIn);
+  signOutButton.addEventListener('click', userSignOut);
+  topUpButton.addEventListener('click', topUp);
+
+
+  
+</script>
+<script>
+    async function updateServerBalance(userName, newBalance) {
+        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=updateBalance&username=${encodeURIComponent(userName)}&balance=${newBalance}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result.success;
+    }
+
+    async function getBalance(userName) {
+        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=queryBalance&username=${encodeURIComponent(userName)}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result.success ? result.balance : 0;
+    }
+
+    function showModal(message) {
+        const modal = document.getElementById('modal');
+        const balanceInfo = document.getElementById('balance-info');
+        balanceInfo.textContent = message;
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.style.display = 'none';
+    }
+
+    function showLoading() {
+        const loadingMessage = document.getElementById('loadingMessage');
+        loadingMessage.style.display = 'flex';
+        setTimeout(() => {
+            loadingMessage.style.opacity = '1';
+        }, 10);
+    }
+
+    function hideLoading() {
+        const loadingMessage = document.getElementById('loadingMessage');
+        loadingMessage.style.opacity = '0';
+        setTimeout(() => {
+            loadingMessage.style.display = 'none';
+        }, 500);
     }
 
     document.querySelectorAll('.box').forEach(box => {
