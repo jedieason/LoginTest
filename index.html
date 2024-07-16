@@ -300,7 +300,7 @@
 
   signInButton.addEventListener('click', userSignIn);
   signOutButton.addEventListener('click', userSignOut);
-  topUpButton..addEventListener('click', topUp);
+  topUpButton.addEventListener('click', topUp);
 
   async function updateServerBalance(userName, newBalance) {
         const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=updateBalance&username=${encodeURIComponent(userName)}&balance=${newBalance}`;
