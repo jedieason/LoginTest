@@ -185,19 +185,30 @@
             border: none;
             outline: none;
         }
+        .user-button {
+            color: #aaa;
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 1em;
+            cursor: pointer;
+            background: none;
+            border: none;
+            outline: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">𝔑𝔗𝔘𝔐𝔈𝔇 ℭ𝔄𝔐𝔓</div>
         <div class="header-button-row">
+            <button id="userButton" class="user-button"><span id="userName"></span></button>
             <button id="signInButton" class="login-button">登入</button>
             <button id="signOutButton" class="login-button">登出</button>
         </div>
 
-    <div id="message">
+    <!-- <div id="message">
         <p>You have signed in as <span id="userName"></span> with the email <span id="userEmail"></span> </p>
-    </div>
+    </div> -->
     <h3>儲值暗網</h3>
         <div class="flex-container">
             <div class="pleaseclick">點一下啦</div>
@@ -246,17 +257,19 @@
 
   const signInButton = document.getElementById("signInButton");
   const signOutButton = document.getElementById("signOutButton");
+  const userButton = document.getElementById("userButton");
   const message = document.getElementById("message");
   const userName = document.getElementById("userName");
   const userEmail = document.getElementById("userEmail");
 
   signOutButton.style.display = "none";
-  message.style.display = "none";
+  userButton.style.display = "none";
 
   const userSignIn = async() => {
     signInWithPopup(auth, provider)
     .then((result) => {
         const user = result.user
+        signInButton.style.display = "none";
         console.log(user);
     }).catch((error) => {
         const errorCode = error.code;
