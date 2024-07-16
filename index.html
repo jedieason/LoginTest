@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -191,10 +191,14 @@
     <div class="container">
         <div class="header">𝔑𝔗𝔘𝔐𝔈𝔇 ℭ𝔄𝔐𝔓</div>
         <div class="header-button-row">
-            <button class="login-button">登入</button>
-            <button class="login-button">登出</button>
+            <button id="signInButton" class="login-button">登入</button>
+            <button id="signOutButton" class="login-button">登出</button>
         </div>
-        <h3>儲值暗網</h3>
+
+    <div id="message">
+        <p>You have signed in as <span id="userName"></span> with the email <span id="userEmail"></span> </p>
+    </div>
+    <h3>儲值暗網</h3>
         <div class="flex-container">
             <div class="pleaseclick">點一下啦</div>
         </div>
@@ -219,237 +223,70 @@
         <div class="message-text">修蛋幾勒</div>
     </div>
 
-    <script>
-        function showModal(message) {
-            const modal = document.getElementById('modal');
-            const balanceInfo = document.getElementById('balance-info');
-            balanceInfo.textContent = message;
-            modal.style.display = 'flex';
-        }
+    <script type="module">
+  
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6NZTH5qHsJahgY7TLlBMjQQvdleYuY7w",
+      authDomain: "auth-f79f5.firebaseapp.com",
+      projectId: "auth-f79f5",
+      storageBucket: "auth-f79f5.appspot.com",
+      messagingSenderId: "543105084905",
+      appId: "1:543105084905:web:09a98504001166b3e26f78"
+    };
+ 
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider()
 
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.style.display = 'none';
-        }
+  const signInButton = document.getElementById("signInButton");
+  const signOutButton = document.getElementById("signOutButton");
+  const message = document.getElementById("message");
+  const userName = document.getElementById("userName");
+  const userEmail = document.getElementById("userEmail");
 
-        async function updateServerBalance(userName, newBalance) {
-            const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=updateBalance&username=${encodeURIComponent(userName)}&balance=${newBalance}`;
-            const response = await fetch(url);
-            const result = await response.json();
-            return result.success;
-        }
+  signOutButton.style.display = "none";
+  message.style.display = "none";
 
-        async function getBalance(userName) {
-            const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=queryBalance&username=${encodeURIComponent(userName)}`;
-            const response = await fetch(url);
-            const result = await response.json();
-            return result.success ? result.balance : 0;
-        }
+  const userSignIn = async() => {
+    signInWithPopup(auth, provider)
+    .then((result) => {
+        const user = result.user
+        console.log(user);
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message
+    })
+  }
 
-        function showLoading() {
-            const loadingMessage = document.getElementById('loadingMessage');
-            loadingMessage.style.display = 'flex';
-            setTimeout(() => {
-                loadingMessage.style.opacity = '1';
-            }, 10);
-        }
+  const userSignOut = async() => {
+    signOut(auth).then(() => {
+        alert("You have signed out successfully!");
+    }).catch((error) => {})
+  }
 
-        function hideLoading() {
-            const loadingMessage = document.getElementById('loadingMessage');
-            loadingMessage.style.opacity = '0';
-            setTimeout(() => {
-                loadingMessage.style.display = 'none';
-            }, 500);
-        }
+  onAuthStateChanged(auth, (user) => {
+    if(user) {
+      signOutButton.style.display = "block";
+      message.style.display = "block";
+      userName.innerHTML = user.displayName;
+      userEmail.innerHTML = user.email
+    } else {
+      signOutButton.style.display = "none";
+      message.style.display = "none";
+    }
+  })
 
-        async function topUp() {
-            const userName = document.getElementById('username').value;
-            const amount = parseInt(document.getElementById('amount').value, 10);
-            if (!userName || isNaN(amount)) {
-                showModal('請填寫完整的資訊');
-                return;
-            }
+  signInButton.addEventListener('click', userSignIn);
+  signOutButton.addEventListener('click', userSignOut);
 
-            showLoading();
 
-            try {
-                const currentBalance = await getBalance(userName);
-                const newBalance = currentBalance + amount;
-                const success = await updateServerBalance(userName, newBalance);
 
-                hideLoading();
-
-                if (success) {
-                    showModal(`儲值成功！\n儲值前金額：${currentBalance}\n儲值後金額：${newBalance}`);
-                } else {
-                    showModal('儲值失敗，請稍後再試');
-                }
-            } catch (error) {
-                hideLoading();
-                showModal('儲值失敗，請稍後再試');
-            }
-        }
-
-        document.querySelectorAll('.box').forEach(box => {
-            box.addEventListener('click', (event) => {
-                if (event.target.textContent === '交易界面') {
-                    window.location.href = 'https://jedieason.github.io/Trading-interface/';
-                } else if (event.target.textContent === 'Crashed') {
-                    window.location.href = 'https://jedieason.github.io/Crashed/';
-                }
-            });
-        });
-
-        function detectDevToolsAndRespond() {
-            let devtools = false;
-            const threshold = 160;
-
-            function stopExecution() {
-                document.body.innerHTML = '<h1>你不可以作弊😡</h1>';
-                setTimeout(function() {
-                    window.location.href = 'https://youtu.be/dQw4w9WgXcQ';
-                }, 2000);
-            }
-
-            function isMobile() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            }
-
-            function checkDevTools() {
-                const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-                const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-
-                if (
-                    !(widthThreshold && heightThreshold) &&
-                    ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || widthThreshold || heightThreshold)
-                ) {
-                    if (!devtools) {
-                        devtools = true;
-                        stopExecution();
-                    }
-                } else {
-                    devtools = false;
-                }
-            }
-
-            if (!isMobile()) {
-                // 每秒檢查一次
-                setInterval(checkDevTools, 1000);
-            } else {
-                console.log('在移動設備上，不執行開發者工具檢測');
-            }
-        }
-
-        // 使用方法
-        detectDevToolsAndRespond();
-
-        function uselessWebButton() {
-            var sitesList = [
-                'https://sliding.toys/mystic-square/8-puzzle/daily/',
-                'https://longdogechallenge.com/',
-                'https://maze.toys/mazes/mini/daily/',
-                'https://optical.toys',
-                'https://paint.toys/',
-                'https://puginarug.com',
-                'https://alwaysjudgeabookbyitscover.com',
-                'https://clicking.toys/flip-grid/neat-nine/3-holes/',
-                'https://weirdorconfusing.com/',
-                'https://checkbox.toys/scale/',
-                'https://memory.toys/classic/easy/',
-                'https://binarypiano.com/',
-                'https://mondrianandme.com/',
-                'https://onesquareminesweeper.com/',
-                'https://cursoreffects.com',
-                'http://floatingqrcode.com/',
-                'https://thatsthefinger.com/',
-                'https://cant-not-tweet-this.com/',
-                'http://heeeeeeeey.com/',
-                'http://corndog.io/',
-                'http://eelslap.com/',
-                'http://www.staggeringbeauty.com/',
-                'http://burymewithmymoney.com/',
-                'https://smashthewalls.com/',
-                'https://jacksonpollock.org/',
-                'http://endless.horse/',
-                'http://drawing.garden/',
-                'https://www.trypap.com/',
-                'http://www.republiquedesmangues.fr/',
-                'http://www.movenowthinklater.com/',
-                'https://sliding.toys/klotski/easy-street/',
-                'https://paint.toys/calligram/',
-                'https://checkboxrace.com/',
-                'http://www.rrrgggbbb.com/',
-                'http://www.koalastothemax.com/',
-                'https://rotatingsandwiches.com/',
-                'http://www.everydayim.com/',
-                'http://randomcolour.com/',
-                'http://maninthedark.com/',
-                'http://cat-bounce.com/',
-                'http://chrismckenzie.com/',
-                'https://thezen.zone/',
-                'http://ninjaflex.com/',
-                'http://ihasabucket.com/',
-                'http://corndogoncorndog.com/',
-                'http://www.hackertyper.com/',
-                'https://pointerpointer.com',
-                'http://imaninja.com/',
-                'http://www.partridgegetslucky.com/',
-                'http://www.ismycomputeron.com/',
-                'http://www.nullingthevoid.com/',
-                'http://www.muchbetterthanthis.com/',
-                'http://www.yesnoif.com/',
-                'http://lacquerlacquer.com',
-                'http://potatoortomato.com/',
-                'http://iamawesome.com/',
-                'https://strobe.cool/',
-                'http://thisisnotajumpscare.com/',
-                'http://doughnutkitten.com/',
-                'http://crouton.net/',
-                'http://corgiorgy.com/',
-                'http://www.wutdafuk.com/',
-                'http://unicodesnowmanforyou.com/',
-                'http://chillestmonkey.com/',
-                'http://scroll-o-meter.club/',
-                'http://www.crossdivisions.com/',
-                'http://tencents.info/',
-                'https://boringboringboring.com/',
-                'http://www.patience-is-a-virtue.org/',
-                'http://pixelsfighting.com/',
-                'http://isitwhite.com/',
-                'https://existentialcrisis.com/',
-                'http://onemillionlols.com/',
-                'http://www.omfgdogs.com/',
-                'http://oct82.com/',
-                'http://chihuahuaspin.com/',
-                'http://www.blankwindows.com/',
-                'http://tunnelsnakes.com/',
-                'http://www.trashloop.com/',
-                'http://spaceis.cool/',
-                'http://www.doublepressure.com/',
-                'http://www.donothingfor2minutes.com/',
-                'http://buildshruggie.com/',
-                'http://yeahlemons.com/',
-                'http://wowenwilsonquiz.com',
-                'http://notdayoftheweek.com/',
-                'http://www.amialright.com/',
-                'https://optical.toys/thatcher-effect/',
-                'https://greatbignothing.com/',
-                'https://zoomquilt.org/',
-                'https://dadlaughbutton.com/',
-                'https://remoji.com/',
-                'http://papertoilet.com/',
-                'https://loopedforinfinity.com/',
-                'https://end.city/',
-                'https://www.bouncingdvdlogo.com/',
-                'https://clicking.toys/peg-solitaire/english/',
-                'https://toms.toys',
-            ];
-
-            var randomSite = sitesList[Math.floor(Math.random() * sitesList.length)];
-            window.open(randomSite, '_blank');
-        }
-
-        document.querySelector('.pleaseclick').addEventListener('click', uselessWebButton);
-    </script>
+</script>
 </body>
 </html>
