@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -219,7 +219,7 @@
         </div>
         <input id="username" type="text" placeholder="儲值帳號名稱">
         <input id="amount" type="number" placeholder="儲值金額">
-        <button onclick="topUp()">儲值</button>
+        <button id="topUpButton">儲值</button>
     </div>
     <div class="modal" id="modal">
         <div class="modal-content" id="modal-content">
@@ -257,6 +257,7 @@
 
   const signInButton = document.getElementById("signInButton");
   const signOutButton = document.getElementById("signOutButton");
+  const topUpButton = document.getElementById("topUpButton");
   const userButton = document.getElementById("userButton");
   const message = document.getElementById("message");
   const userName = document.getElementById("userName");
@@ -279,6 +280,8 @@
 
   const userSignOut = async() => {
     signOut(auth).then(() => {
+        signOutButton.style.display = "none";
+        userButton.style.display = "none";
         alert("You have signed out successfully!");
     }).catch((error) => {})
   }
@@ -297,7 +300,21 @@
 
   signInButton.addEventListener('click', userSignIn);
   signOutButton.addEventListener('click', userSignOut);
+  topUpButton..addEventListener('click', topUp);
 
+  async function updateServerBalance(userName, newBalance) {
+        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=updateBalance&username=${encodeURIComponent(userName)}&balance=${newBalance}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result.success;
+    }
+
+    async function getBalance(userName) {
+        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=queryBalance&username=${encodeURIComponent(userName)}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result.success ? result.balance : 0;
+    }
   
 </script>
 <script>
@@ -311,20 +328,6 @@
     function closeModal() {
         const modal = document.getElementById('modal');
         modal.style.display = 'none';
-    }
-
-    async function updateServerBalance(userName, newBalance) {
-        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=updateBalance&username=${encodeURIComponent(userName)}&balance=${newBalance}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        return result.success;
-    }
-
-    async function getBalance(userName) {
-        const url = `https://script.google.com/macros/s/AKfycbxPoiqIEsIRR4rnsrjKzULK3Pm7GevufMIlqQ2rsuORIFBNx7KK_gAWIWELIUL3QolK/exec?action=queryBalance&username=${encodeURIComponent(userName)}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        return result.success ? result.balance : 0;
     }
 
     function showLoading() {
