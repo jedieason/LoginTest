@@ -182,20 +182,19 @@
             padding: 3px 6px;
             font-size: 1em;
             cursor: pointer;
-            background: none;
             border: none;
             outline: none;
         }
+
         .user-button {
-            color: #aaa;
-            background: #fff; /* 修改這一行，改為白色背景 */
+            color: #000; /* 修改這一行，改為黑色文字 */
+            background: #f0f0f0; /* 修改這一行，改為淺灰色背景 */
             border-radius: 6px;
-            padding: 3px;
+            padding: 3px 6px;
             font-size: 1em;
             cursor: pointer;
-            border: none;
+            border: 1px solid #ccc; /* 新增這一行，加上邊框 */
             outline: none;
-            width: auto;
         }
     </style>
 </head>
@@ -283,6 +282,7 @@
     signOut(auth).then(() => {
         signOutButton.style.display = "none";
         userButton.style.display = "none";
+        signInButton.style.display = "block";
         showModal("成功登出");
     }).catch((error) => {})
   }
@@ -303,7 +303,7 @@
 
     async function topUp() {
         if (!checkUserEmail(userEmail)){
-            alert('用學校email登入');
+            showModal('請用學校email登入');
             return;
         }
         const userName = document.getElementById('username').value;
