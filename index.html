@@ -38,7 +38,7 @@
             border-radius: 5px;
             font-size: 1em;
         }
-        .container button {
+        .topup-button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -50,7 +50,11 @@
             font-size: 1em;
             transition: background-color 0.3s, transform 0.3s;
         }
-        .container button:hover {
+        .topup-button:hover {
+            background-color: #333;
+            transform: scale(1.05);
+        }
+        .login-button:hover {
             background-color: #333;
             transform: scale(1.05);
         }
@@ -178,8 +182,8 @@
         .login-button {
             color: #fff;
             background: #000;
-            border-radius: 6px;
-            padding: 3px 6px;
+            border-radius: 24px;
+            padding: 5px 12px;
             font-size: 1em;
             cursor: pointer;
             border: none;
@@ -187,13 +191,13 @@
         }
 
         .user-button {
-            color: #000; /* 修改這一行，改為黑色文字 */
-            background: #f0f0f0; /* 修改這一行，改為淺灰色背景 */
+            color: #333; /* 修改這一行，改為黑色文字 */
+            background: transparent; /* 修改這一行，改為淺灰色背景 */
             border-radius: 6px;
-            padding: 3px 6px;
+            padding: 5px;
             font-size: 1em;
             cursor: pointer;
-            border: 1px solid #ccc; /* 新增這一行，加上邊框 */
+            border: none; /* 新增這一行，加上邊框 */
             outline: none;
         }
     </style>
@@ -202,7 +206,7 @@
     <div class="container">
         <div class="header">𝔑𝔗𝔘𝔐𝔈𝔇 ℭ𝔄𝔐𝔓</div>
         <div class="header-button-row">
-            <button id="userButton" class="user-button"><span id="userName"></span></button>
+            <button id="userButton" class="user-button">jedieason<span id="userName"></span></button>
             <button id="signInButton" class="login-button">登入</button>
             <button id="signOutButton" class="login-button">登出</button>
         </div>
@@ -220,7 +224,7 @@
         </div>
         <input id="username" type="text" placeholder="儲值帳號名稱">
         <input id="amount" type="number" placeholder="儲值金額">
-        <button id="topUpButton">儲值</button>
+        <button class="topup-button" id="topUpButton">儲值</button>
     </div>
     <div class="modal" id="modal">
         <div class="modal-content" id="modal-content">
@@ -264,7 +268,7 @@
   const userName = document.getElementById("userName");
 
   signOutButton.style.display = "none";
-  userButton.style.display = "none";
+//   userButton.style.display = "none";
 
   const userSignIn = async() => {
     signInWithPopup(auth, provider)
